@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>事件模拟</title>
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		#wrap {
+			position: relative;
+			width:300px;
+			height: 500px;
+			padding-right: 50px;
+			margin-top: 100px;
+			background-color: hsla(250,100%,60%,0.5);
+			overflow: hidden;
+			-webkit-user-select:none;
+		}
+		#content {
+			position: relative;
+		}
+		#slideBar {
+			display: none;
+			position: absolute;
+			right: 0;
+			top:0;
+			width:50px;
+			height: 100%;
+			background-color: hsla(100,100%,50%,0.6);
+		}
+		#slider {
+			position: absolute;
+			left:0;
+			top:0;
+			width: 100%;
+			/*height: 20px;*/
+			background-color: hsla(0,100%,50%,0.8)
+		}
+		body {
+			/*height: 2000px;*/
+		}
+	</style>
+
+</head>
+<body>
+	<div id="wrap">
+		<div id="content">
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam suscipit, totam molestiae natus,Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmodtempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodoconsequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat nonproident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmodtempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam suscipit, totam molestiae natus,Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmodtempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodoconsequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat nonproident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmodtempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam suscipit, totam molestiae natus,Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmodtempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodoconsequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat nonproident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmodtempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+		</div>
+		<div id="slideBar">
+			<div id="slider"></div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		(function() {
+			function $(id) {
+			return document.getElementById(id);
+		}
+		var wrap     = $("wrap"),
+			content  = $("content"),
+			slideBar =$("slideBar"),
+			slider   =$("slider");
+		if( wrap.offsetHeight >= content.offsetHeight ) return;
+		//1.内容超出容器,生成滚动条,显示之后才能获取高度
+		slideBar.style.display = "block";
+		//2.比例
+		//容器的高度/内容的比例   === 滑块的高度/滚动条的高度
+		// wrap.offsetHeight == wrap.scrollHeight
+		var scale = wrap.offsetHeight/content.offsetHeight;
+		slider.style.height = scale * slideBar.offsetHeight +"px";
+		var wrapPos = wrap.getBoundingClientRect();
+		var maxTop = slideBar.offsetHeight - slider.offsetHeight;
+		//3.拖拽
+		slider.onmousedown = function(e) {
+			var e = e || window.event;
+			var disTop = e.clientY - slider.offsetTop;
+			document.onmousemove = function(e) {
+				var e = e || window.event;
+				var bTop = e.clientY - disTop;
+				if(bTop <0 ){
+					bTop = 0;
+				}else if (bTop >maxTop ) {
+					bTop = maxTop;
+				}
+				slider.style.top = bTop +"px";
+				//改变内容的top值
+				content.style.top = -bTop/scale +"px";
+			}
+			document.onmouseup = function() {
+				document.onmousemove = null;
+			}
+		}
+		//点击滚动条
+		slideBar.onclick = function(e) {
+			var e = e || window.event;
+			var bTop = e.clientY - wrapPos.top -slider.offsetHeight/2;
+			if(bTop <0){
+				bTop = 0;
+			}else if(bTop > maxTop) {
+				bTop =maxTop;
+			}
+			slider.style.top = bTop + "px";
+			//改变内容的top值
+			content.style.top = -bTop/scale +"px";
+		}
+		//键盘事件
+		document.onkeydown = function(e) {
+			var e = e || window.event;
+			var bTop = slider.offsetTop;
+			if(e.keyCode === 38) {
+				bTop -= 10;
+			}else if(e.keyCode === 40){
+				bTop +=10;
+			}
+			if(bTop <0){
+				bTop = 0;
+			}else if(bTop > maxTop) {
+				bTop =maxTop;
+			}
+			slider.style.top = bTop +"px";
+			content.style.top = -bTop/scale +"px";
+		}
+		//6.滚轮事件
+		wrap.onmousewheel = function(e) {
+			var e = e || window.event;
+			var bTop = slider.offsetTop;
+			if(e.wheelDelta >0 ){
+				bTop +=10;
+			}else {
+				bTop -=10;
+			}
+			if(bTop <0){
+				bTop = 0;
+			}else if(bTop > maxTop) {
+				bTop =maxTop;
+			}
+			slider.style.top = bTop +"px";
+			content.style.top = -bTop/scale +"px";
+		}
+		wrap.addEventListener("DOMMouseScroll",function(e){
+			var e = e || window.event;
+			var bTop = slider.offsetTop;
+			if(e.detial< 0 ){
+				bTop +=10;
+			}else {
+				bTop -=10;
+			}
+			if(bTop <0){
+				bTop = 0;
+			}else if(bTop > maxTop) {
+				bTop =maxTop;
+			}
+			slider.style.top = bTop +"px";
+			content.style.top = -bTop/scale +"px";
+		},false)
+		}())
+	</script>
+</body>
+</html>

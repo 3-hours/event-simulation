@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>todoList</title>
+</head>
+<body>
+	<input type="text" id="input" autofocus>
+	<button id="btn">add</button>
+	<ol id="list">
+	</ol>
+	<script type="text/javascript">
+		var input = document.getElementById("input");
+		var btn = document.getElementById("btn");
+		var list = document.getElementById("list");
+		btn.onclick = function(e) {
+			//内容不为空的时候
+			if(input.value.trim()) {
+				var newli = document.createElement("li");
+				newli.innerText = input.value;
+				list.insertBefore(newli, list.children[0]);
+				input.value = "";
+				input.focus();
+				/*newli.onclick = function() {
+					this.remove();
+				}*/
+			}
+		}
+		//enter 键也能发表记录,逻辑代码跟点击按钮事件处理函数一样
+		input.onkeypress = function(e) {
+			var e = e || window.event;
+			//shift+enter发表内容
+			if(e.shiftKey && e.keyCode === 13) {
+				btn.click(); //事件模拟
+			}
+		}
+		//事件委托 点击li删除事件委托
+		list.onclick = function(e) {
+			var e = e || window.event;
+			console.log(e);
+			var target = e.target || e.srcElement;
+			if(target.tagName === "LI"){
+				list.removeChild(target);
+			}
+		}
+	</script>
+</body>
+</html>
